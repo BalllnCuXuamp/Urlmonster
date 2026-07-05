@@ -1,0 +1,15 @@
+[package]
+name = "rust_scan"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }
+aho-corasick = "1"
+memchr = "2"
+hex = "0.4"
+regex = "1"
+sha1 = "0.10"
