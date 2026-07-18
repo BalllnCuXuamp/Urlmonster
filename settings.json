@@ -1,0 +1,21 @@
+{
+  "src": "C:/Users/azakh/Downloads/Coфт/URLMonster/base",
+  "out": "C:/Users/azakh/Downloads/Coфт/URLMonster/Results",
+  "mode": "auto",
+  "filters": {
+    "exclude_empty": true,
+    "case_sensitive": false
+  },
+  "use_multiprocess": true,
+  "use_resume": true,
+  "regex_mode": false,
+  "use_unique_db": true,
+  "default_save_full": false,
+  "split_size": 500000,
+  "export_delim": "colon",
+  "theme": "dark",
+  "gui_theme": "Сапфир",
+  "blacklist": [],
+  "perf_mode": "ssd",
+  "lang": "ru"
+}

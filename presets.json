@@ -1,0 +1,20 @@
+{
+  "100": {
+    "src": "C:/Users/azakh/Downloads/базы",
+    "out": "C:\\Users\\azakh\\Downloads\\Checkers\\results",
+    "queries": [
+      "steam",
+      "riotgames",
+      "origin"
+    ],
+    "mode": "auto",
+    "filters": {},
+    "use_multiprocess": true,
+    "use_resume": false,
+    "regex_mode": false,
+    "blacklist": "",
+    "split_size": 100000,
+    "export_delim": "colon",
+    "theme": "dark"
+  }
+}
