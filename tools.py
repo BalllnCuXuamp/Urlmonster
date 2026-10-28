@@ -10,6 +10,13 @@ import time
 # Re-export the theme helper so tools match the app theme
 from ui_components import th, Toast
 
+# monster_core: SpillSet — дедуп на диске (M-05), content_hash
+try:
+    from monster_core import SpillSet, content_hash
+except ImportError:
+    SpillSet = None
+    content_hash = None
+
 # ──────────────────────────────────────────────
 #  File Splitter
 # ──────────────────────────────────────────────
@@ -83,11 +90,12 @@ class FileSplitter(ctk.CTkToplevel):
         os.makedirs(out, exist_ok=True)
         self._running = True
         self._go_btn.configure(state="disabled", text="⏳ Разделение...")
-        threading.Thread(target=self._split, args=(src, out), daemon=True).start()
+        # M-13: tk-переменные читаются ТОЛЬКО в main thread — значение передаётся аргументом
+        max_lines = self._lines_per_file.get()
+        threading.Thread(target=self._split, args=(src, out, max_lines), daemon=True).start()
 
-    def _split(self, src, out):
+    def _split(self, src, out, max_lines):
         try:
-            max_lines = self._lines_per_file.get()
             start = time.time()
             total_lines = 0
             part = 1
@@ -104,7 +112,8 @@ class FileSplitter(ctk.CTkToplevel):
                         fout = None
                         part += 1
                     if i % 500000 == 0:
-                        self._status.configure(text=f"Обработано: {total_lines:,} строк | Частей: {part}")
+                        # M-13: все tk-обновления — через self.after (main thread)
+                        self.after(0, lambda tl=total_lines, p=part: self._status.configure(text=f"Обработано: {tl:,} строк | Частей: {p}"))
                 if fout:
                     fout.close()
             elapsed = time.time() - start
@@ -197,46 +206,72 @@ class MergeTool(ctk.CTkToplevel):
         os.makedirs(out, exist_ok=True)
         self._running = True
         self._merge_btn.configure(state="disabled", text="⏳ Слияние...")
-        threading.Thread(target=self._merge, args=(out,), daemon=True).start()
+        folders = list(self._folders)
+        threading.Thread(target=self._merge, args=(out, folders), daemon=True).start()
 
-    def _merge(self, out):
+    def _merge(self, out, folders):
+        """M-05: потоковое слияние без RAM-сетов — дедуп через SpillSet (диск,
+        blake2b-16). Порядок строк не сортируется, уникальность сохраняется."""
+        seen_all = None
         try:
             start = time.time()
-            merged = {}  # query_name -> set of lines
             total_input = 0
             total_unique = 0
+            seen_all = SpillSet() if SpillSet is not None else None
+            if seen_all is None:
+                raise RuntimeError("monster_core недоступен — SpillSet (дедуп на диске) не найден")
 
-            for folder in self._folders:
+            # Группируем файлы по qname (query)
+            qfiles = {}
+            for folder in folders:
                 self.after(0, lambda f=folder: self._status.configure(text=f"Читаю: {os.path.basename(f)}..."))
                 for fname in os.listdir(folder):
-                    if not fname.endswith(".txt") or fname in ("report.txt", "report.html", "report.json"):
+                    if not fname.endswith(".txt") or fname in ("report.txt", "report.html", "report.json", "index.sqlite"):
                         continue
                     fpath = os.path.join(folder, fname)
                     if not os.path.isfile(fpath):
                         continue
                     qname = os.path.splitext(fname)[0]
-                    if qname not in merged:
-                        merged[qname] = set()
-                    with open(fpath, "rb", buffering=4 * 1024 * 1024) as f:
-                        for line in f:
-                            line = line.rstrip(b"\r\n")
-                            if line:
-                                merged[qname].add(line)
-                                total_input += 1
+                    qfiles.setdefault(qname, []).append(fpath)
 
-            self.after(0, lambda: self._status.configure(text="Записываю результат..."))
-            for qname, lines in merged.items():
+            self.after(0, lambda: self._status.configure(text="Пишу результат (потоковый дедуп)..."))
+            batch = []
+            for qname, fpaths in qfiles.items():
                 target = os.path.join(out, f"{qname}.txt")
-                with open(target, "wb", buffering=4 * 1024 * 1024) as f:
-                    for line in sorted(lines):
-                        f.write(line + b"\n")
-                total_unique += len(lines)
+                fout = open(target, "wb", buffering=4 * 1024 * 1024)
+                try:
+                    for fpath in fpaths:
+                        with open(fpath, "rb", buffering=4 * 1024 * 1024) as f:
+                            for line in f:
+                                line = line.rstrip(b"\r\n")
+                                if not line:
+                                    continue
+                                total_input += 1
+                                h = content_hash(line)
+                                if seen_all.contains(h):
+                                    continue
+                                seen_all.add(h)
+                                fout.write(line + b"\n")
+                                total_unique += 1
+                                batch.append(h)
+                                if len(batch) >= 100000:
+                                    batch = []
+                finally:
+                    fout.close()
+                self.after(0, lambda ti=total_input, tu=total_unique: self._status.configure(text=f"✓ {tu:,} из {ti:,} строк..."))
 
             elapsed = time.time() - start
             self.after(0, lambda: self._done(total_input, total_unique, elapsed))
         except Exception as e:
-            self.after(0, lambda: messagebox.showerror("Ошибка", str(e)))
+            self.after(0, lambda _e=e: messagebox.showerror("Ошибка", str(_e)))
             self.after(0, self._reset)
+        finally:
+            # PRIME FIX: гарантия очистки spill-базы даже при исключении/прерывании
+            if seen_all is not None:
+                try:
+                    seen_all.cleanup()
+                except Exception:
+                    pass
 
     def _done(self, total_input, total_unique, elapsed):
         Toast.show(self.master, f"Слияние готово: {total_unique:,} уникальных из {total_input:,} строк", "success")

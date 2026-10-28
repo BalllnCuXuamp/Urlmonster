@@ -11,10 +11,10 @@
   "regex_mode": false,
   "use_unique_db": true,
   "default_save_full": false,
-  "split_size": 500000,
+  "split_size": "50000",
   "export_delim": "colon",
   "theme": "dark",
-  "gui_theme": "Сапфир",
+  "gui_theme": "PRIME Ион",
   "blacklist": [],
   "perf_mode": "ssd",
   "lang": "ru"

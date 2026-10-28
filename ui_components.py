@@ -18,8 +18,152 @@ THEMES = {
         "text": "#1f2328", "text_sec": "#656d76", "accent": "#0969da",
         "accent2": "#1a7f37", "danger": "#cf222e", "warn": "#9a6700",
     },
+    "cyber": {
+        "bg": "#0A0014", "card": "#15002A", "border": "#300060",
+        "text": "#FFEEFF", "text_sec": "#AA66AA", "accent": "#FF2D95",
+        "accent2": "#00FF41", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "matrix": {
+        "bg": "#000A00", "card": "#001500", "border": "#003300",
+        "text": "#D0FFD0", "text_sec": "#4FA84F", "accent": "#00FF41",
+        "accent2": "#39FF5C", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "nebula": {
+        "bg": "#0D0815", "card": "#1A1028", "border": "#3A2060",
+        "text": "#F8E0FF", "text_sec": "#B088C0", "accent": "#E040FB",
+        "accent2": "#F06FFF", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "arctic": {
+        "bg": "#0A1220", "card": "#132038", "border": "#1A3060",
+        "text": "#E8F4FD", "text_sec": "#6699BB", "accent": "#4FC3F7",
+        "accent2": "#81D4FA", "danger": "#FF5555", "warn": "#FFD700",
+    },
+    "flame": {
+        "bg": "#140800", "card": "#2A1200", "border": "#502800",
+        "text": "#FFF0E0", "text_sec": "#CC7744", "accent": "#FF6D00",
+        "accent2": "#FF9100", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "acid": {
+        "bg": "#0A0F00", "card": "#141A00", "border": "#2A3800",
+        "text": "#F8FFE0", "text_sec": "#88AA33", "accent": "#C6FF00",
+        "accent2": "#EEFF41", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "void": {
+        "bg": "#08000E", "card": "#12001A", "border": "#2A0040",
+        "text": "#F0E8FF", "text_sec": "#A58CC8", "accent": "#7C4DFF",
+        "accent2": "#B388FF", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "synth": {
+        "bg": "#0E0018", "card": "#1A0030", "border": "#380060",
+        "text": "#FFE8F0", "text_sec": "#C888AA", "accent": "#FF4081",
+        "accent2": "#FF80AB", "danger": "#FF4444", "warn": "#FFD700",
+    },
+    "quantum": {
+        "bg": "#000D14", "card": "#001A28", "border": "#003050",
+        "text": "#E0FFFF", "text_sec": "#4499AA", "accent": "#00E5FF",
+        "accent2": "#18FFFF", "danger": "#FF5555", "warn": "#FFD700",
+    },
+    # Концепт C «Криогенная лаборатория»: почти чёрный фон с глубиной,
+    # ледяные тонкие линии, свечение только на активном элементе
+    "cryo": {
+        "bg": "#02060C", "card": "#04101C", "border": "#0A2A44",
+        "text": "#E4F2FF", "text_sec": "#8CB8D8", "accent": "#66D9FF",
+        "accent2": "#B4E8FF", "danger": "#FF5566", "warn": "#FFE066",
+    },
+    # Концепт B «Картография данных»: цвет несёт данные,
+    # изотермы плотности холодный синий -> янтарный
+    "geo": {
+        "bg": "#061014", "card": "#0A1A20", "border": "#14343C",
+        "text": "#E8F4F0", "text_sec": "#98C0B4", "accent": "#FFB300",
+        "accent2": "#66D9CC", "danger": "#FF5566", "warn": "#FFD700",
+    },
+    # PRIME Living Interface — 5 уникальных тем, которых нет ни у кого
+    "prime_abyss": {
+        "bg": "#030B14", "card": "#071626", "border": "#0E2E4A",
+        "text": "#DFF3FF", "text_sec": "#6FA8C9", "accent": "#00E5A0",
+        "accent2": "#4DC3FF", "danger": "#FF5D73", "warn": "#FFC94D",
+    },
+    "prime_dune": {
+        "bg": "#140E08", "card": "#221610", "border": "#4A2E1A",
+        "text": "#FFF1DE", "text_sec": "#C9A06F", "accent": "#FF9E3D",
+        "accent2": "#FFD23D", "danger": "#FF5D5D", "warn": "#FFE066",
+    },
+    "prime_moss": {
+        "bg": "#0A0F0A", "card": "#131A12", "border": "#24301F",
+        "text": "#EAF5E4", "text_sec": "#8AA37E", "accent": "#9DFF57",
+        "accent2": "#E4FF57", "danger": "#FF6B6B", "warn": "#FFD93D",
+    },
+    "prime_ion": {
+        "bg": "#0B0B1E", "card": "#151538", "border": "#2C2C6E",
+        "text": "#ECECFF", "text_sec": "#8E8ED1", "accent": "#7C7CFF",
+        "accent2": "#FF7C9E", "danger": "#FF5D5D", "warn": "#FFD23D",
+    },
+    "prime_velvet": {
+        "bg": "#120A12", "card": "#1E121E", "border": "#3E243E",
+        "text": "#F8EAF8", "text_sec": "#B98AB9", "accent": "#E09A4D",
+        "accent2": "#F5D08A", "danger": "#FF6B6B", "warn": "#FFE066",
+    },
 }
 _current_theme = "dark"
+
+# Фазы конвейера (концепт A «Верстак»)
+PIPELINE_PHASES = ["Detect", "Scan", "Dedup", "Merge", "Report"]
+
+
+class PhasePipeline(ctk.CTkFrame):
+    """Концепт A: конвейер фаз как первый класс UI — не прогресс-бар.
+    Фазы зажигаются последовательно: Detect -> Scan -> Dedup -> Merge -> Report."""
+
+    def __init__(self, master, **kw):
+        super().__init__(master, fg_color="transparent", **kw)
+        self._dots = {}
+        self._seps = []
+        for i, phase in enumerate(PIPELINE_PHASES):
+            c = tk.Canvas(self, width=22, height=22, highlightthickness=0, bd=0)
+            c.pack(side="left", padx=2)
+            self._dots[phase] = c
+            self._draw_dot(phase, "#444444")
+            if i < len(PIPELINE_PHASES) - 1:
+                sep = ctk.CTkLabel(self, text="—", text_color="#444444", font=("Segoe UI", 10))
+                sep.pack(side="left", padx=1)
+                self._seps.append(sep)
+        self._phase = None
+
+    def _draw_dot(self, phase, color):
+        c = self._dots[phase]
+        c.delete("all")
+        try:
+            c.create_oval(4, 4, 18, 18, outline=color, width=2)
+            if color != "#444444":
+                c.create_oval(8, 8, 14, 14, fill=color, outline="")
+        except Exception:
+            pass
+
+    def set_phase(self, phase):
+        """Подсвечивает текущую фазу и все пройденные; гасит будущие."""
+        self._phase = phase
+        if phase not in PIPELINE_PHASES:
+            return
+        idx = PIPELINE_PHASES.index(phase)
+        accent = th("accent")
+        muted = "#444444"
+        for i, p in enumerate(PIPELINE_PHASES):
+            self._draw_dot(p, accent if i <= idx else muted)
+        for i, sep in enumerate(self._seps):
+            try:
+                sep.configure(text_color=accent if i < idx else muted)
+            except Exception:
+                pass
+
+    def reset(self):
+        self._phase = None
+        for p in PIPELINE_PHASES:
+            self._draw_dot(p, "#444444")
+        for sep in self._seps:
+            try:
+                sep.configure(text_color="#444444")
+            except Exception:
+                pass
 
 def th(key):
     return THEMES[_current_theme][key]
@@ -47,10 +191,10 @@ class TitleBar(ctk.CTkFrame):
         frame.pack(side="right")
 
         btn_kw = dict(width=46, height=40, corner_radius=0, border_width=0)
-        ctk.CTkButton(frame, text="─", command=on_min or self._noop, fg_color="transparent", text_color=th("text_sec"), hover_color=th("border"), **btn_kw).pack(side="right")
+        ctk.CTkButton(frame, text="─", command=on_min or self._noop, fg_color="transparent", text_color=th("text_sec"), hover_color=th("border"), **btn_kw).pack(side="left")
         max_btn = ctk.CTkButton(frame, text="□", command=on_max or self._noop, fg_color="transparent", text_color=th("text_sec"), hover_color=th("border"), **btn_kw)
-        max_btn.pack(side="right")
-        ctk.CTkButton(frame, text="✕", command=on_close or self._noop, fg_color="transparent", text_color=th("text_sec"), hover_color=th("danger"), **btn_kw).pack(side="right")
+        max_btn.pack(side="left")
+        ctk.CTkButton(frame, text="✕", command=on_close or self._noop, fg_color="transparent", text_color=th("text_sec"), hover_color=th("danger"), **btn_kw).pack(side="left")
 
         # drag
         self.bind("<Button-1>", self._drag_start)
@@ -142,15 +286,22 @@ class Toast:
 class LiveLog(ctk.CTkTextbox):
     def __init__(self, master, **kw):
         super().__init__(master, wrap="none", **kw)
-        self.tag_config("info", foreground=th("text_sec"))
-        self.tag_config("ok", foreground=th("accent2"))
-        self.tag_config("err", foreground=th("danger"))
-        self.tag_config("warn", foreground=th("warn"))
-        self.tag_config("acc", foreground=th("accent"))
         self._auto_scroll = True
+        self._max_lines = 2000   # M-14: растёт неограниченно -> кап
+
+    def copy_text(self):
+        self.clipboard_clear()
+        self.clipboard_append(self.get("1.0", "end").strip())
 
     def write(self, msg, tag="info"):
         self.insert("end", msg + "\n", tag)
+        # M-14: держим не более _max_lines строк
+        try:
+            line_count = int(self.index("end-1c").split(".")[0])
+            if line_count > self._max_lines:
+                self.delete("1.0", f"{line_count - self._max_lines}.0")
+        except Exception:
+            pass
         if self._auto_scroll:
             self.see("end")
 
@@ -196,6 +347,7 @@ class SplitPane(ctk.CTkFrame):
             right_widget.grid(row=0, column=2, sticky="nsew")
             self._div.bind("<Button-1>", self._drag_start)
             self._div.bind("<B1-Motion>", self._drag_horiz)
+            self._div.bind("<ButtonRelease-1>", self.stop_drag)
         else:
             self.rowconfigure(0, weight=1)
             self.rowconfigure(2, weight=1)
@@ -206,6 +358,7 @@ class SplitPane(ctk.CTkFrame):
             right_widget.grid(row=2, column=0, sticky="nsew")
             self._div.bind("<Button-1>", self._drag_start)
             self._div.bind("<B1-Motion>", self._drag_vert)
+            self._div.bind("<ButtonRelease-1>", self.stop_drag)
 
     def _drag_start(self, e):
         self._drag = True
