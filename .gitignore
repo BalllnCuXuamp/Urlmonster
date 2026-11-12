@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyd.bak
+*.pyd.bak2
+*.pyd.preopt
+
+# Rust build artifacts
+rust_engine_src/target/
+
+# Test data (large user files)
+Base/
+
+# Sensitive / runtime data (never commit user data)
+unique_strings.bin
+unique_strings.json
+unique_db.sqlite
+unique_db.sqlite-shm
+unique_db.sqlite-wal
+processed_files.json
+_progress.json
+checkpoint.json
+settings.json
+presets.json
+Results/
+results/
+archive_cache.json
+
